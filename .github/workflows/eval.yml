@@ -1,0 +1,46 @@
+name: Anomaly Detection — Eval Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  evaluate:
+    name: Run eval pipeline & regression gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run evaluation pipeline
+        # Exit code 1 if best F1 < 0.80 — this is the regression gate
+        run: python scripts/eval_pipeline.py --threshold 0.80 --data-dir data/valve1
+
+      - name: Upload eval results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ github.sha }}
+          path: eval_results.json
+          retention-days: 30
+
+      - name: Upload human review queue (if generated)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-queue-${{ github.sha }}
+          path: human_review_queue.json
+          if-no-files-found: ignore
+          retention-days: 30
