@@ -1,4 +1,4 @@
-numpy>=1.26
+numpy>=1.26,<2.0
 pandas>=2.0
 scikit-learn>=1.4
 xgboost>=2.0

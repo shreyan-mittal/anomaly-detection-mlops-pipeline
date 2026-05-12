@@ -136,7 +136,7 @@ def bootstrap_f1_ci(
         method="percentile",
         random_state=42,
     )
-    return float(result.confidence_interval.low), float(result.confidence_interval.high)
+    return float(np.asarray(result.confidence_interval.low).item()), float(np.asarray(result.confidence_interval.high).item())
 
 
 # ---------------------------------------------------------------------------
